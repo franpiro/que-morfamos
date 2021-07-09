@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/que-morfamos",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
