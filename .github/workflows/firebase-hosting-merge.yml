@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:         
       - uses: actions/checkout@v2
-      - name: Build
+      - name: Install npm stuff
+      - run: npm install
+      - name: Build        
         run: npm run build --prod
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
