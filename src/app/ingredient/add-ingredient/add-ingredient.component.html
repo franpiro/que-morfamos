@@ -1,0 +1,34 @@
+<div class="container">
+  <h2 style="text-align:center">Agregar ingrediente</h2>
+  <form [formGroup]="ingredientForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Nombre</label>
+      <input id="name" formControlName="name" type="text" class="form-control" placeholder="Ingresar ingrediente">
+      <div *ngIf="name.invalid && (name.dirty || name.touched)" class="alert alert-danger">
+        <div *ngIf="name.errors.required">
+          Requerido.
+        </div>
+        <div *ngIf="name.errors.maxlength">
+          Maximo 30 caracteres.
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-success" [disabled]="!ingredientForm.valid">Agregar</button>
+  </form>
+  <h2 style="text-align:center;margin-top: 20px;">Listado ingredientes</h2>
+  <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="searchTermWord" (ngModelChange)="searchTerm($event)" placeholder="Buscar ingrediente">
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let ingredient"> {{ingredient.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef> Eliminar </th>
+      <td mat-cell *matCellDef="let ingredient"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; cursor: pointer;" (click)="deleteIngredient(ingredient.id)"></i></td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>        
+  </table>
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+</div>
+<app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>

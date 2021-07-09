@@ -1,0 +1,39 @@
+<form [formGroup]="ingredientForm" (ngSubmit)="onSubmit()">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Cantidad</th>
+        <th>Eliminar</th>
+      </tr>
+    </thead>
+    <tbody id="fields">
+      <tr formArrayName="ingredients" *ngFor="let array of ingredientForm.get('ingredients')['controls']; let i = index">
+        <td formGroupName="{{i}}"><input placeholder="Ingresar ingrediente" formControlName="ingredient" id="typeahead-basic" type="text" class="form-control" [resultFormatter]="formatResult" [inputFormatter]="formatResult" [class.is-invalid]="searchFailed" [ngbTypeahead]="searchIngredient"/></td>
+        <td formGroupName="{{i}}"><input placeholder="Ingresar cantidad" formControlName="quantity" id="quantity" type="text" class="form-control"></td>
+        <td formGroupName="{{i}}"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; margin-left: 20px; margin-top: 2px; cursor: pointer;" (click)="DeleteIngredientRow(i)"></i></td>
+      </tr>  
+    </tbody>
+  </table>
+  <button class="btn btn-success" type="button" (click)="addIngredient()">Agregar ingrediente</button>
+  <button style="margin-left:20px;" [disabled]="!ingredientForm.valid" type="submit" class="btn btn-success">Buscar Receta</button>
+</form>
+<div>
+  <h2 style="text-align:center;margin-top: 20px;">Listado Recetas</h2>
+  <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="searchTermWord" (ngModelChange)="searchTerm($event)" placeholder="Buscar receta">
+  <table mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let recipe"><a routerLink="/recipe/details/{{recipe.id}}">{{recipe.name}} </a></td>
+    </ng-container>
+    <ng-container matColumnDef="eliminar">
+      <th mat-header-cell *matHeaderCellDef> Eliminar </th>
+      <td mat-cell *matCellDef="let recipe"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; cursor: pointer;" (click)="deleteRecipe(recipe.id)"></i></td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>    
+  </table>
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+</div>
+<app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>
+  

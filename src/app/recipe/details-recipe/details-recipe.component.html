@@ -1,0 +1,53 @@
+<ng-template [ngIf]="recipe" [ngIfElse]="noRecipe">
+  <div class="row">
+    <div class="col-6">
+      <div class="row">
+        <h1 style="text-align:center; font-weight: bold;">{{recipe.name}}</h1><i class="fa fa-pencil-square fa-2x" aria-hidden="true" style="margin-left: 10px;color:lightblue; cursor: pointer;" [routerLink]='["/recipe/edit", recipe.id]'></i>
+      </div>
+      <div class="row">
+        <h2>Descripcion</h2>        
+      </div>
+      <div class="row">
+        <h4>{{recipe.description}}</h4>
+      </div>
+    </div>
+    <div class="col-6">
+      <img src="{{recipe.imageUrl}}" width="350" height="350">
+    </div>  
+  </div>
+  <hr />
+  <br />
+  <h2>Ingredientes:</h2>
+
+  <ul *ngFor="let ingredient of recipe.ingredients">
+    <li>{{ingredient.name}} | Gr.: {{ingredient.quantity}}</li>
+  </ul>
+  <hr />
+  <br />
+  <h2>Pasos:</h2>
+  <label class="checkbox-container" *ngFor="let step of recipe.steps">    
+    {{step.step}}
+    <input type="checkbox" [checked]="false" (change)="changeStatus(record.id,$event)">
+    <span class="checkmark"></span>    
+  </label>
+  <hr />
+  <br />
+    <ng-template [ngIf]="(userService.currentUser.roleName == 'RecipeAdmin' || userService.currentUser.roleName == 'admin') && !recipe.isApproved">
+      <h1>Para aprobar esta receta hace click <button class="btn btn-success" (click)="approveRecipe()">Aca</button></h1>
+    </ng-template>
+    <ng-template [ngIf]="(userService.currentUser.roleName == 'RecipeAdmin' || userService.currentUser.roleName == 'admin') && !recipe.isDeleted">
+      <h1>Para eliminar esta receta hace click <button class="btn btn-danger" (click)="deleteRecipe()">Aca</button></h1>
+    </ng-template>
+    <ng-template [ngIf]="(userService.currentUser.roleName == 'RecipeAdmin' || userService.currentUser.roleName == 'admin') && recipe.isDeleted">
+      <h1>Esta receta fue eliminada. Podes recuperarla haciendo click <button class="btn btn-primary" (click)="recoverRecipe(recipe.id)">Aca</button></h1>
+    </ng-template>
+  <app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>
+</ng-template>
+
+<ng-template #noRecipe>
+  <h1>Receta no encontrada</h1>
+</ng-template>
+  
+  
+  
+  

@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "que-morfamos": {
+      "hosting": {
+        "que-morfamos": [
+          "que-morfamos"
+        ]
+      }
+    }
+  }
+}

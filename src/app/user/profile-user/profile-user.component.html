@@ -1,0 +1,66 @@
+<div class="row">
+    <div class="col-12">
+        <h1 style="text-align: center;">{{user.name}}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-4">
+        <h3 style="text-align: center;">{{user.email}}</h3>
+    </div>
+    <div class="col-4" style="text-align: center;">
+        <div class="dropdown">
+            <button class="dropbtn">{{user.roleName.charAt(0).toUpperCase() + user.roleName.slice(1)}}</button>
+            <div class="dropdown-content">
+              <div *ngFor="let role of roles" (click)="updateRole(role.id, role.name)">{{role.name.charAt(0).toUpperCase() + role.name.slice(1)}}</div>
+            </div>
+          </div>
+        <!--<h3 style="text-align: center;">{{user.roleName.charAt(0).toUpperCase() + user.roleName.slice(1)}}</h3>-->
+    </div>
+    <div class="col-4">
+        <h3 style="text-align: center;">Estatus: {{user.isBanned ? "Suspendida" : "Activa"}}</h3>
+    </div>
+</div>
+<div class="row" style="margin-top: 20px;">
+    <div class="col-12" style="text-align: center;">
+        <button *ngIf="!user.isBanned" class="btn btn-danger" (click)="banUser(user.documentId)">Deshabilitar cuenta</button>
+        <button *ngIf="user.isBanned" class="btn btn-info" (click)="unbanUser(user.documentId)">Habiitar cuenta</button>
+    </div>
+</div>
+<hr>
+<div class="row">  
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <h2 style="text-align:center;margin-top: 20px;">Listado Recetas de {{user.name}}</h2>
+            </div>
+        </div>  
+        <div class="row">
+            <div class="col-12">
+                <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" (ngModelChange)="searchTerm($event)" placeholder="Buscar receta">
+            </div>
+        </div>
+        <div class="row">
+            <table mat-table [dataSource]="dataSource">
+                <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Nombre </th>
+                <td mat-cell *matCellDef="let recipe"><a routerLink="/recipe/details/{{recipe.id}}">{{recipe.name}}</a></td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef> Estatus </th>
+                    <td mat-cell *matCellDef="let recipe">{{recipe.isApproved ? "Aprobada" : "En revisión"}}</td>
+                </ng-container>
+                <ng-container matColumnDef="eliminar">
+                <th mat-header-cell *matHeaderCellDef> Acción </th>
+                <td mat-cell *matCellDef="let recipe">
+                    <i *ngIf="!recipe.isApproved" class="fa fa-check fa-2x" aria-hidden="true" style="color:green; cursor: pointer;" (click)="approveRecipe(recipe.id)"></i>
+                    <i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; cursor: pointer;" (click)="deleteRecipe(recipe.id)"></i>
+                </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>    
+            </table>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>      
+        </div>
+    </div>
+</div>
+<app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>

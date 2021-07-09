@@ -1,0 +1,52 @@
+<header>
+    <nav class='navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3'>
+      <div class="container">
+        <a class="navbar-brand" [routerLink]='["/"]'>Que morfamos</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-label="Toggle navigation"
+          [attr.aria-expanded]="isExpanded" (click)="toggle()">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse" [ngClass]='{"show": isExpanded}'>
+  
+          <ul *ngIf="userService.currentUser == null" class="navbar-nav flex-grow">
+            <li class="nav-item" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" style="cursor:pointer" (click)="logIn()">Ingresar</a>
+            </li>
+          </ul>
+
+          <ul class="navbar-nav flex-grow" *ngIf="userService.currentUser != null" >
+            <li class="nav-item" [routerLinkActive]='["link-active"]' [routerLinkActiveOptions]='{ exact: true }'>
+              <a class="nav-link text-dark" [routerLink]='["/recipe/search"]'>Buscar Recetas</a>
+            </li>
+            <li class="nav-item" *ngIf="userService.currentUser.roleName == 'RecipeCreator' || userService.currentUser.roleName == 'RecipeApprover' || userService.currentUser.roleName == 'admin' || userService.currentUser.roleName == 'admin'" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" [routerLink]='["/recipe/add"]'>Sugerir Receta</a>
+            </li>            
+            <li class="nav-item" *ngIf="userService.currentUser.roleName == 'admin'" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" [routerLink]='["/ingredient/add"]'>Sugerir Ingrediente</a>
+            </li>
+            <li class="nav-item" *ngIf="userService.currentUser.roleName == 'RecipeApprover' || userService.currentUser.roleName == 'RecipeAdmin' || userService.currentUser.roleName == 'admin'" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" [routerLink]='["/suggestion/judgesuggestion"]'>Juzgar Sugerencias</a>
+            </li>
+            <li class="nav-item" *ngIf="userService.currentUser.roleName == 'RecipeApprover' || userService.currentUser.roleName == 'RecipeAdmin' || userService.currentUser.roleName == 'admin'" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" [routerLink]='["/suggestion/judgesuggestion"]'>Recuperar</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" style="cursor:pointer" [routerLink]='["user/list"]'>Usuarios</a>
+            </li>
+            <li class="nav-item" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" [routerLink]='["/user/profile", userService.currentUser.id]'>Perfil</a>
+            </li>            
+            <li class="nav-item" [routerLinkActive]='["link-active"]'>
+              <a class="nav-link text-dark" style="cursor:pointer" (click)="logOut()">Desconectar</a>
+            </li>
+
+          </ul>
+          <ul class="navbar-nav flex-grow">
+            <li class="nav-item" [routerLinkActive]='["link-active"]' [routerLinkActiveOptions]='{ exact: true }'>
+              <a class="nav-link text-dark" [routerLink]='["/"]'>Inicio</a>
+            </li>            
+          </ul>
+        </div>
+      </div>
+    </nav>
+</header>
