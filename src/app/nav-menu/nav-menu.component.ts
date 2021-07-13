@@ -10,7 +10,7 @@ export class NavMenuComponent implements OnInit {
 
   constructor(public userService: UserService) { }
 
-  ngOnInit(): void {
+  ngOnInit(): void {    
   }
   isExpanded = false;
 
@@ -20,11 +20,7 @@ export class NavMenuComponent implements OnInit {
 
   toggle() {
     this.isExpanded = !this.isExpanded;
-  }
-
-  logIn() {
-    this.userService.logIn();
-  }
+  }  
 
   logOut() {
     this.userService.logOut();

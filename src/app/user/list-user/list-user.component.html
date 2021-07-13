@@ -1,4 +1,4 @@
-<div>
+<ng-template [ngIf]="userService.currentUser.roleName == 'admin'" [ngIfElse]="noPermission">
     <h2 style="text-align:center;margin-top: 20px;">Listado Usuarios</h2>
     <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="searchTermWord" (ngModelChange)="searchTerm($event)" placeholder="Buscar usuario">
     <table mat-table [dataSource]="dataSource">
@@ -29,5 +29,8 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>    
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-</div>
 <app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>
+</ng-template>
+<ng-template #noPermission>
+    <h1>Permiso insuficiente!</h1>
+</ng-template>

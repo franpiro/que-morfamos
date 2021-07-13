@@ -1,69 +1,62 @@
+<ng-template [ngIf]="userService.currentUser">
+  <h1>Crear Receta</h1>
+  <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Nombre</label>
+      <input formControlName="name" id="name" type="text" class="form-control" placeholder="Ingresar nombre">
+    </div>
 
-<ng-template [ngIf]="userService.currentUser.roleName == 'RecipeCreator' || userService.currentUser.roleName == 'RecipeApprover' || userService.currentUser.roleName == 'RecipeAdmin' || userService.currentUser.roleName == 'admin'" [ngIfElse]="noPermission">
-  <div class="container">
-    <h1>Crear Receta</h1>
-
-    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="name">Nombre</label>
-        <input formControlName="name" id="name" type="text" class="form-control" placeholder="Ingresar nombre">
-      </div>
-
-      <div class="form-group">
-        <label for="description">Descripción</label>
-        <input formControlName="description" id="description" type="text" class="form-control" placeholder="Ingresar descripcion">
-      </div> 
-      <div>
-        <h3>Agregar Ingredientes</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Gramos</th>
-              <th>Eliminar</th>
-            </tr>
-          </thead>
-          <tbody id="fields">
-            <tr formArrayName="ingredients" *ngFor="let array of recipeForm.controls.ingredients.controls; let i = index">
-              <td formGroupName="{{i}}"><input placeholder="Ingresar ingrediente" formControlName="ingredient" id="typeahead-basic" type="text" class="form-control" [resultFormatter]="formatResult" [inputFormatter]="formatResult" [class.is-invalid]="searchFailed" [ngbTypeahead]="searchIngredient"/></td>
-              <td formGroupName="{{i}}"><input placeholder="Ingresar cantidad" formControlName="quantity" id="quantity" type="text" class="form-control"></td>
-              <td formGroupName="{{i}}"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; margin-left: 20px; margin-top: 2px; cursor: pointer;" (click)="deleteIngredientRow(i)"></i></td>
-            </tr>
-        </table>  
-      </div>    
-      <button class="btn btn-success" type="button" (click)="addIngredient()">Agregar Ingrediente</button>
-      <div>
-        <h3 style="margin-top: 20px;">Agregar Pasos</h3>
-        <table class="table" style="margin-top: 20px;">
-          <thead>
-            <tr>
-              <th scope="col">Paso</th>
-              <th scope="col">Gramos</th>
-              <th>Eliminar</th>
-            </tr>
-          </thead>
-          <tbody id="fields">
-            <tr formArrayName="steps" *ngFor="let array of recipeForm.controls.steps.controls; let i = index">
-              <td formGroupName="{{i}}"># {{i + 1}}</td>
-              <td formGroupName="{{i}}"><input placeholder="Ingresar descripcion del paso" formControlName="step" id="step" type="text" class="form-control"></td>
-              <td formGroupName="{{i}}"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; margin-left: 20px; margin-top: 2px; cursor: pointer;" (click)="deleteStepRow(i)"></i></td>
-            </tr>
-        </table>
-      </div>
-      <button class="btn btn-success" type="button" (click)="addStep()">Agregar Pasos</button>
-      <div class="form-group" style="margin-top: 20px;">
-        <h3 for="imageUploader">Cargar una imagen de la receta</h3>
-        <input type="file" class="form-control-file" id="imageUploader" name="resume" formControlName="image" (change)="changeImage($event)">
-        <img *ngIf="imageName" [src]="imageUrl" width="150" height="150">
-      </div>      
-      <hr>
-      <button style="margin-left:20px; float:right" [disabled]="!recipeForm.valid" type="submit" class="btn btn-success">Cargar Receta</button>
-    </form>
-
-  </div>
+    <div class="form-group">
+      <label for="description">Descripción</label>
+      <input formControlName="description" id="description" type="text" class="form-control" placeholder="Ingresar descripcion">
+    </div> 
+    <div>
+      <h3>Agregar Ingredientes</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Nombre | Medida</th>
+            <th scope="col">Cantidad</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody id="fields">
+          <tr formArrayName="ingredients" *ngFor="let array of recipeForm.controls.ingredients.controls; let i = index">
+            <td formGroupName="{{i}}"><input placeholder="Ingresar ingrediente" formControlName="ingredient" id="typeahead-basic" type="text" class="form-control" [resultFormatter]="formatResult" [inputFormatter]="formatResult" [class.is-invalid]="searchFailed" [ngbTypeahead]="searchIngredient"/></td>
+            <td formGroupName="{{i}}"><input placeholder="Ingresar cantidad" formControlName="quantity" id="quantity" type="text" class="form-control"></td>
+            <td formGroupName="{{i}}"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; margin-left: 20px; margin-top: 2px; cursor: pointer;" (click)="deleteIngredientRow(i)"></i></td>
+          </tr>
+        </tbody>
+      </table>  
+    </div>    
+    <button class="btn btn-success" type="button" (click)="addIngredient()">Agregar Ingrediente</button>
+    <div>
+      <h3 style="margin-top: 20px;">Agregar Pasos</h3>
+      <table class="table" style="margin-top: 20px;">
+        <thead>
+          <tr>
+            <th scope="col">Paso</th>
+            <th scope="col">Descripción</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody id="fields">
+          <tr formArrayName="steps" *ngFor="let array of recipeForm.controls.steps.controls; let i = index">
+            <td formGroupName="{{i}}"># {{i + 1}}</td>
+            <td formGroupName="{{i}}"><input placeholder="Ingresar descripcion del paso" formControlName="step" id="step" type="text" class="form-control"></td>
+            <td formGroupName="{{i}}"><i class="fa fa-times fa-2x" aria-hidden="true" style="color:red; margin-left: 20px; margin-top: 2px; cursor: pointer;" (click)="deleteStepRow(i)"></i></td>
+          </tr>
+      </table>
+    </div>
+    <button class="btn btn-success" type="button" (click)="addStep()">Agregar Pasos</button>
+    <div class="form-group" style="margin-top: 20px;">
+      <h3 for="imageUploader">Cargar una imagen de la receta</h3>
+      <input type="file" class="form-control-file" id="imageUploader" name="resume" formControlName="image" (change)="changeImage($event)">
+      <img *ngIf="imageUrl" [src]="imageUrl" width="150" height="150">
+    </div>      
+    <hr>
+    <button style="margin-left:20px; float:right" [disabled]="!recipeForm.valid" type="submit" class="btn btn-success">Cargar Receta</button>
+  </form>
   <app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>
-</ng-template>
-<ng-template #noPermission>
-  <h1>Permiso insuficiente!</h1>
 </ng-template>
   

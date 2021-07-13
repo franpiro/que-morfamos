@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { HomeComponent } from './home/home.component';
 import { AddIngredientComponent } from './ingredient/add-ingredient/add-ingredient.component';
+import { LoginComponent } from './login/login.component';
 import { AddRecipeComponent } from './recipe/add-recipe/add-recipe.component';
 import { DetailsRecipeComponent } from './recipe/details-recipe/details-recipe.component';
 import { EditRecipeComponent } from './recipe/edit-recipe/edit-recipe.component';
@@ -15,6 +16,7 @@ import { ProfileUserComponent } from './user/profile-user/profile-user.component
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },  
+  { path: 'login', component: LoginComponent },
   { path: 'ingredient/add', component: AddIngredientComponent, canActivate: [AuthGuard] },
   { path: 'recipe/add', component: AddRecipeComponent, canActivate: [AuthGuard] },
   { path: 'suggestion/judgesuggestion', component: JudgeSuggestionComponent, canActivate: [AuthGuard] },
@@ -23,7 +25,7 @@ const routes: Routes = [
   { path: 'recipe/edit/:id', component: EditRecipeComponent, canActivate: [AuthGuard] },
   { path: 'user/profile/:id', component: ProfileUserComponent, canActivate: [AuthGuard] },
   { path: 'user/list', component: ListUserComponent, canActivate: [AuthGuard] },
-  { path: 'recover', component: RecoverComponent, canActivate: [AuthGuard] }
+  { path: 'recover', component: RecoverComponent, canActivate: [AuthGuard] }  
 ];
 
 @NgModule({

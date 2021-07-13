@@ -10,6 +10,8 @@ import { RecipeService } from 'src/app/shared/services/recipe/recipe.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FirestorageService } from 'src/app/shared/services/firestorage/firestorage.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { MeasurementUnitService } from 'src/app/shared/services/measurementUnit/measurement-unit.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-recipe',
@@ -28,14 +30,14 @@ export class AddRecipeComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder, public userService: UserService, private ingredientService: IngredientService, 
     private recipeService: RecipeService, private snackBar: MatSnackBar, private firestorageService: FirestorageService,
-    private domSanitizer: DomSanitizer) { }
+    private domSanitizer: DomSanitizer, private measurementUnitService: MeasurementUnitService, private router: Router) { }
 
   get name() { return this.recipeForm.get('name'); }
   get description() { return this.recipeForm.get('description'); }
   get ingredient() { return this.recipeForm.get('ingredient'); }
   get quantity() { return this.recipeForm.get('quantity'); }
 
-  formatResult = (result: Ingredient) => result.name;
+  formatResult = (result: Ingredient) => result.name + " | " + result.measurementUnitName;
 
   ngOnInit(): void {
     this.recipeForm = new FormGroup({
@@ -45,7 +47,15 @@ export class AddRecipeComponent implements OnInit {
       steps: this.formBuilder.array([this.createStepFormGroup()]),
       image: new FormControl(null, Validators.required)
     });
-    this.ingredientService.getAllApprovedIngredients().subscribe(res => this.ingredientList = res);
+    this.measurementUnitService.getAllMeasurementUnits().subscribe(measurementUnitList => {
+      this.ingredientService.getAllApprovedIngredients().subscribe(res => {
+        console.log(measurementUnitList);
+        console.log(res);
+        this.ingredientList = res
+        this.ingredientList.forEach(ingredient => ingredient.measurementUnitName = measurementUnitList.find(x => x.id = ingredient.measurementUnitId).name);
+      });
+    })
+    
   }
 
   createIngredientFormGroup(): FormGroup {
@@ -81,18 +91,25 @@ export class AddRecipeComponent implements OnInit {
     this.steps.push(this.createStepFormGroup());
   }
 
-  searchIngredient: OperatorFunction<string, Ingredient[]> = (text$: Observable<string>) =>
+  searchIngredient: OperatorFunction<string, Ingredient[]> = (text$: Observable<string>) => 
     text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
       map(term => term.length < 2 ? []
-        : this.ingredientList.filter(v => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1).map(x => <Ingredient>{ id: x.id, name: x.name} ).slice(0, 10))
+        : this.ingredientList.filter(v => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1).map(x => <Ingredient>{ id: x.id, name: x.name, measurementUnitName: x.measurementUnitName} ).slice(0, 10))
     )
 
-  changeImage(event): void {    
-    this.imageUrl = this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(event.target.files[0]));
-    this.formData.delete('image');
-    this.formData.append('image', event.target.files[0], event.target.files[0].name)
+  changeImage(event): void {  
+    if(event.target.files[0]) {
+      this.imageUrl = this.domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(event.target.files[0]));
+      this.formData.delete('image');
+      this.formData.append('image', event.target.files[0], event.target.files[0].name)
+    } 
+    else {
+      this.imageUrl = "";
+      this.formData.delete('image');
+    } 
+    
   }
 
   onSubmit() {
@@ -100,7 +117,22 @@ export class AddRecipeComponent implements OnInit {
     this.recipeForm.value.isApproved = false;
     this.recipeForm.value.isDeleted = false;
     this.recipeForm.value.createdById = this.userService.currentUser.id; 
-    this.recipeForm.value.ingredients.forEach(x => ingredientList.push({ id: x.ingredient.id, quantity: Number(x.quantity), name: x.ingredient.name }));
+    var badIngredient = false;
+    this.recipeForm.value.ingredients.forEach(x =>  { 
+      if (x.ingredient.id){
+        ingredientList.push({ id: x.ingredient.id, quantity: Number(x.quantity) }) 
+      }        
+      else {
+        this.snackBar.open(`Ingrediente ${x.ingredient} cargado incorrectamente.`, "", {
+          duration: 2000,
+          panelClass: ['mat-toolbar', 'mat-warn']
+        })
+        badIngredient = true;
+      }
+    });
+    if (badIngredient) {
+      return;
+    }
     this.recipeForm.value.ingredients = ingredientList;
     let file = this.formData.get('image');
     this.showSpinner = true;
@@ -117,6 +149,7 @@ export class AddRecipeComponent implements OnInit {
                 duration: 2000,
                 panelClass: ['mat-toolbar', 'mat-primary']
               })
+              this.router.navigateByUrl("/recipe/search");
             })
           })          
         }          

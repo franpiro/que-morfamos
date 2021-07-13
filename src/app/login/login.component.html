@@ -1,0 +1,15 @@
+<ng-template [ngIf]="!userService.currentUser" [ngIfElse]="loggedIn">
+    <div class="row">
+        <div class="col-6 offset-5">
+        <div class="google-btn" (click)="logIn()">
+            <div class="google-icon-wrapper">
+                <img class="google-icon" src="assets/images/Google_Logo.svg"/>
+            </div>
+            <p class="btn-text"><b>Sign in with google</b></p>
+        </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #loggedIn>
+    <h1>Welcome {{userService.currentUser.name}}! You are already logged in!</h1>
+</ng-template>

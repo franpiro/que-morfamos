@@ -1,6 +1,7 @@
 <div class="container">
     <h1>Bienvenido!</h1>
     <hr/>
-    <h4>Estas en la aplicacion Que morfamos?. La aplicacion que permite buscar recetas dependiendo que ingredientes tenes!</h4>
-    <p>Si queres buscar una receta tienes que iniciar sesion <a [routerLink]='["/recipe/search"]'>aqui</a></p>
+    <h4>Estas en la aplicacion Que morfamos! La aplicacion que permite buscar recetas dependiendo que ingredientes tenes!</h4>
+    <p *ngIf="!userService.currentUser">Para buscar una receta tenes que iniciar sesion <a [routerLink]='["/login"]'>aqui</a>.</p>
+    <p *ngIf="userService.currentUser">Para buscar una receta hace click <a [routerLink]='["/recipe/search"]'>aqui</a>.</p>
 </div>

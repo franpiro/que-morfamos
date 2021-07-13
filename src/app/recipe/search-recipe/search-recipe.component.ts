@@ -9,6 +9,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { Ingredient } from 'src/app/shared/interfaces/ingredient';
 import { Recipe } from 'src/app/shared/interfaces/recipe';
 import { IngredientService } from 'src/app/shared/services/ingredient/ingredient.service';
+import { MeasurementUnitService } from 'src/app/shared/services/measurementUnit/measurement-unit.service';
 import { RecipeService } from 'src/app/shared/services/recipe/recipe.service';
 import { UserService } from 'src/app/shared/services/user/user.service';
 
@@ -24,15 +25,24 @@ export class SearchRecipeComponent implements OnInit {
   ingredients: FormArray;
   public dataSource: MatTableDataSource<Recipe>;
   public searchTermWord;
-  displayedColumns: string[] = ['name', 'eliminar'];
+  displayedColumns: string[];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   public showSpinner = false;
 
-  constructor(public userService: UserService, private formBuilder: FormBuilder, private recipeService: RecipeService, private ingredientService: IngredientService, private snackBar: MatSnackBar) { }
+  constructor(public userService: UserService, private formBuilder: FormBuilder, private recipeService: RecipeService, 
+    private ingredientService: IngredientService, private snackBar: MatSnackBar, private measurementUnitService: MeasurementUnitService) { }
 
   ngOnInit(): void {
     this.createEmptyForm();
-    this.ingredientService.getAllApprovedIngredients().subscribe(res => this.ingredientList = res); 
+    this.measurementUnitService.getAllMeasurementUnits().subscribe(measurementUnitList => {
+      this.ingredientService.getAllApprovedIngredients().subscribe(res => {
+        console.log(measurementUnitList);
+        console.log(res);
+        this.ingredientList = res
+        this.ingredientList.forEach(ingredient => ingredient.measurementUnitName = measurementUnitList.find(x => x.id == ingredient.measurementUnitId).name);
+      });
+    })
+    this.displayedColumns = (this.userService.currentUser?.roleName == 'approver' || this.userService.currentUser?.roleName == 'admin') ? ["name", "delete"] : ["name"]
   }
 
   createEmptyForm(): void {
@@ -56,7 +66,6 @@ export class SearchRecipeComponent implements OnInit {
         duration: 2000,
         panelClass: ['mat-toolbar', 'mat-primary']
       });
-      console.log(this.recipesSearched)
     }).catch(() => {
       this.showSpinner = false;
       this.snackBar.open("No se pudo eliminar la receta.", "", {
@@ -76,10 +85,10 @@ export class SearchRecipeComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       map(term => term.length < 2 ? []
-        : this.ingredientList.filter(v => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1).map(x => <Ingredient>{ id: x.id, name: x.name} ).slice(0, 10))
+        : this.ingredientList.filter(v => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1).map(x => <Ingredient>{ id: x.id, name: x.name, measurementUnitName: x.measurementUnitName} ).slice(0, 10))
     )
     
-    formatResult = (result: Ingredient) => result.name;
+  formatResult = (result: Ingredient) => result.name + " | " + result.measurementUnitName;
 
   onSubmit(): void {
     var formatedIngredientList = [];
@@ -91,21 +100,17 @@ export class SearchRecipeComponent implements OnInit {
       for (var recipe of res) {
         if (recipe.ingredients.every(v => {        
           if (formatedIngredientList.some(x => x.id == v.id)) {
-            debugger;
             return Number(formatedIngredientList.find(x => x.id == v.id).quantity) >= Number(v.quantity);
           }
           return false;
         })) {
-          console.log(this.recipesSearched);
           this.recipesSearched.push(recipe);
         }
       }
       this.dataSource = new MatTableDataSource(this.recipesSearched);
       this.dataSource.paginator = this.paginator;
       this.showSpinner = false;
-    });
-    
-    console.log(this.ingredientForm.value);
+    });  
   }
 
   searchTerm(event: string) {

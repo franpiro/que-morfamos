@@ -27,6 +27,7 @@ import { EditRecipeComponent } from './recipe/edit-recipe/edit-recipe.component'
 import { ListUserComponent } from './user/list-user/list-user.component';
 import { ProfileUserComponent } from './user/profile-user/profile-user.component';
 import { RecoverComponent } from './recover/recover.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { RecoverComponent } from './recover/recover.component';
     EditRecipeComponent,
     ListUserComponent,
     ProfileUserComponent,
-    RecoverComponent
+    RecoverComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

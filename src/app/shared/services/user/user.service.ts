@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
 import firebase from 'firebase/app'
 import { Observable } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { Role } from '../../interfaces/role';
 import { User } from '../../interfaces/user'
-import { UserRole } from '../../interfaces/userRole';
+import { RoleService } from '../role/role.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,17 +17,22 @@ export class UserService {
   public currentUser: User;
   public user: Observable<firebase.User | null >;
 
-  constructor(public afAuth: AngularFireAuth, private firestore: AngularFirestore) { 
+  constructor(public afAuth: AngularFireAuth, private firestore: AngularFirestore, private router: Router, private roleService: RoleService) { 
     this.user = this.afAuth.authState;
   }
 
-  public logIn(): any { 
+  public logIn(): Promise<void> { 
     const googleAuthProvider = new firebase.auth.GoogleAuthProvider(); 
-    this.afAuth.signInWithPopup(googleAuthProvider).then((data) => { 
+    return this.afAuth.signInWithPopup(googleAuthProvider).then((data) => { 
 
       this.firestore.collection<User>("users", ref => ref.where("id", "==",  data.user.uid)).valueChanges({ idField: "documentId"}).subscribe(user => {
         if (user.length != 0) {
-          this.firestore.collection<Role>("roles").doc(user[0].roleId).valueChanges().subscribe(role => {
+          if (user[0].isBanned) {
+            alert("Estas banea2 :C");
+            this.logOut();
+            return;
+          }
+          this.roleService.getRoleById(user[0].roleId).subscribe(role => {
             this.currentUser = {
               id: user[0].id,
               name: user[0].name,
@@ -37,7 +44,7 @@ export class UserService {
             }
           });
         } else {
-          this.firestore.collection<Role>("roles", ref => ref.where("name", "==",  "user")).valueChanges().subscribe(role => {
+          this.roleService.getRoleByName("user").subscribe(role => {
             this.firestore.collection("users").add(
             {
               id: data.user.uid,
@@ -45,7 +52,8 @@ export class UserService {
               name: data.user.displayName,
               email: data.user.email,
               isBanned: false
-            }).then(() => {
+            }).then((x) => {
+              console.log("id", x.id);
               this.currentUser = {
                 id: data.user.uid,
                 name: data.user.displayName,
@@ -57,9 +65,18 @@ export class UserService {
               }
             })            
           });
-        }             
+        }
+        return Promise;        
       })                       
     });    
+  }
+
+  public logOut() {
+    this.afAuth.signOut().then(() => {
+      console.log("here");
+      this.currentUser = null;
+      this.router.navigateByUrl("/")
+    });
   }
 
   setCurrentUser() {
@@ -80,21 +97,17 @@ export class UserService {
     })    
   }
 
-  get authenticated(): boolean {
-    return this.user != null;
+  get authenticated(): Promise<boolean> {
+    return this.afAuth.authState.pipe(first()).toPromise().then(user => {
+      return user ? true : false;
+    }).catch(x => {
+      return false;
+    })
   }
 
   get currentUserAsync(): Observable<firebase.User | null> {
     return this.user;
   }
-
-  public logOut() {
-    this.afAuth.signOut().then(() => {
-      this.currentUser = null;
-    });
-  }
-
-
 
   public getAllUsers(): Observable<User[]> {
     return this.firestore.collection<User>("users").valueChanges({ idField: "documentId"});

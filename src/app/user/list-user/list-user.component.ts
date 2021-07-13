@@ -41,36 +41,40 @@ export class ListUserComponent implements OnInit {
   }
 
   banUser(documentId) {
-    this.showSpinner = true;
-    this.userService.banUser(documentId).then(() => {
-      this.showSpinner = false;
-      this.snackBar.open("Usuario deshabilitado satisfactoriamente.", "", {
-        duration: 2000,
-        panelClass: ['mat-toolbar', 'mat-primary']
-      })
-    }).catch(() => {
-      this.showSpinner = false;
-      this.snackBar.open("No se pudo deshabilitar el usuario.", "", {
-        duration: 2000,
-        panelClass: ['mat-toolbar', 'mat-warn']
-      })
-    });
+    if (this.userService.currentUser.roleName == 'admin') {
+      this.showSpinner = true;
+      this.userService.banUser(documentId).then(() => {
+        this.showSpinner = false;
+        this.snackBar.open("Usuario deshabilitado satisfactoriamente.", "", {
+          duration: 2000,
+          panelClass: ['mat-toolbar', 'mat-primary']
+        })
+      }).catch(() => {
+        this.showSpinner = false;
+        this.snackBar.open("No se pudo deshabilitar el usuario.", "", {
+          duration: 2000,
+          panelClass: ['mat-toolbar', 'mat-warn']
+        })
+      });
+    }
   }
 
   unbanUser(documentId) {
-    this.showSpinner = true;
-    this.userService.unbanUser(documentId).then(() => {
-      this.showSpinner = false;
-      this.snackBar.open("Usuario activado satisfactoriamente.", "", {
-        duration: 2000,
-        panelClass: ['mat-toolbar', 'mat-primary']
-      })
-    }).catch(() => {
-      this.showSpinner = false;
-      this.snackBar.open("No se pudo activar el usuario.", "", {
-        duration: 2000,
-        panelClass: ['mat-toolbar', 'mat-warn']
-      })
-    });
+    if (this.userService.currentUser.roleName == 'admin') {
+      this.showSpinner = true;
+      this.userService.unbanUser(documentId).then(() => {
+        this.showSpinner = false;
+        this.snackBar.open("Usuario activado satisfactoriamente.", "", {
+          duration: 2000,
+          panelClass: ['mat-toolbar', 'mat-primary']
+        })
+      }).catch(() => {
+        this.showSpinner = false;
+        this.snackBar.open("No se pudo activar el usuario.", "", {
+          duration: 2000,
+          panelClass: ['mat-toolbar', 'mat-warn']
+        })
+      });
+    }
   }
 }

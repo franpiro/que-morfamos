@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Ingredient } from 'src/app/shared/interfaces/ingredient';
 import { Recipe } from 'src/app/shared/interfaces/recipe';
+import { IngredientService } from 'src/app/shared/services/ingredient/ingredient.service';
+import { MeasurementUnitService } from 'src/app/shared/services/measurementUnit/measurement-unit.service';
 import { RecipeService } from 'src/app/shared/services/recipe/recipe.service';
 import { UserService } from 'src/app/shared/services/user/user.service';
 
@@ -12,14 +15,28 @@ import { UserService } from 'src/app/shared/services/user/user.service';
 })
 export class DetailsRecipeComponent implements OnInit {
   public recipe: Recipe;
+  public createdByName: string;
   public showSpinner = false;
-  constructor(private recipeService: RecipeService, private activatedRoute: ActivatedRoute, public userService: UserService, private router: Router, private snackBar: MatSnackBar) { }
+  constructor(private recipeService: RecipeService, private ingredientService: IngredientService, private measurmentUnitService: MeasurementUnitService, private activatedRoute: ActivatedRoute, public userService: UserService, private router: Router, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.recipeService.getRecipeById(this.activatedRoute.snapshot.paramMap.get('id')).subscribe((res) => {
-      console.log(res);
-      this.recipe = res;
-    })
+    this.ingredientService.getAllIngredients().subscribe(ingredientList => {
+      this.measurmentUnitService.getAllMeasurementUnits().subscribe(measurementUnitList => {
+        this.recipeService.getRecipeById(this.activatedRoute.snapshot.paramMap.get('id')).subscribe((res) => {    
+          if (res.name != undefined) {
+            this.recipe = res;
+            this.recipe.ingredients.forEach(ingredient => {
+              var ing = ingredientList.find(x => x.id == ingredient.id);
+              var measuringUnit = measurementUnitList.find(x => x.id == ing.measurementUnitId);
+              ingredient.name = ing.name;
+              ingredient.measurementUnitName = measuringUnit.name;
+            });
+            this.userService.getUserById(this.recipe.createdById).subscribe(user => this.createdByName = user[0].name)
+          }                    
+        });
+      })
+      
+    });    
   }
 
   deleteRecipe(): void {

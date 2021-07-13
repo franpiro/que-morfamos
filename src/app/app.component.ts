@@ -13,8 +13,8 @@ export class AppComponent {
   }
   title = 'que-morfamos';
 
-  checkUser() {
-    if (this.userService.authenticated) {
+  async checkUser() {
+    if (await this.userService.authenticated) {
       this.userService.setCurrentUser();
     }
   }

@@ -7,6 +7,8 @@ import { Ingredient } from 'src/app/shared/interfaces/ingredient'
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MeasurementUnit } from 'src/app/shared/interfaces/measurementUnit';
+import { MeasurementUnitService } from 'src/app/shared/services/measurementUnit/measurement-unit.service';
 
 @Component({
   selector: 'app-add-ingredient',
@@ -21,19 +23,29 @@ export class AddIngredientComponent implements OnInit {
   public showSpinner = false;
   public dataSource: MatTableDataSource<Ingredient>;
   public searchTermWord: string;
-  displayedColumns: string[] = ['name', 'delete'];
+  public measurementUnitList: MeasurementUnit[];
+
+  displayedColumns: string[];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   
   
-  constructor(public userService: UserService, private ingredientService: IngredientService, private snackBar: MatSnackBar) {
+  constructor(public userService: UserService, private ingredientService: IngredientService, private snackBar: MatSnackBar, private measurementUnit: MeasurementUnitService) {
     this.ingredientForm = new FormGroup({
-      name: new FormControl(null, [Validators.required, Validators.maxLength(30)])
+      name: new FormControl(null, [Validators.required, Validators.maxLength(30)]),
+      measurementUnit: new FormControl(null, [])
     }, { updateOn: 'blur' });    
   }
 
   get name() { return this.ingredientForm.get('name'); }
 
-  ngOnInit(): void {};
+  ngOnInit(): void {
+    
+    this.measurementUnit.getAllMeasurementUnits().subscribe(measurementUnit => {
+      this.measurementUnitList = measurementUnit;
+      this.ingredientForm.get('measurementUnit').setValue(measurementUnit[0]);
+    });
+    this.displayedColumns = (this.userService.currentUser?.roleName == 'approver' || this.userService.currentUser?.roleName == 'admin') ? ["name", "measurementUnit", "delete"] : ["name", "measurementUnit"]
+  };
 
   ngAfterViewInit(): void {
     this.ingredientService.getAllApprovedIngredients().subscribe(res => {
@@ -43,11 +55,14 @@ export class AddIngredientComponent implements OnInit {
     }); 
   }
 
+  updateMeasurementUnit(measurementUnit) {
+    this.ingredientForm.get('measurementUnit').setValue(measurementUnit);
+  }
+
   onSubmit(): void {
     this.showSpinner = true;
-    this.ingredientForm.value.isDeleted = false;
-    this.ingredientForm.value.isApproved = false;
-    this.ingredientService.postIngredient(this.ingredientForm.value)
+    var ingredientToUpload: Ingredient = <Ingredient> { name: this.ingredientForm.value.name, measurementUnitId: this.ingredientForm.value.measurementUnit.id, isApproved: false, isDeleted: false }
+    this.ingredientService.postIngredient(ingredientToUpload)
       .then(() =>  {
         this.showSpinner = false;
         this.snackBar.open("Ingrediente creado satisfactoriamente.", "", {

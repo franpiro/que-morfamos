@@ -10,4 +10,5 @@ export interface Recipe {
     isDeleted: boolean;
     imageName: string;
     imageUrl: string;
+    createdById: string;    
 }
