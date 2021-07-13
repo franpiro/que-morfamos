@@ -29,7 +29,8 @@ export class AddIngredientComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   
   
-  constructor(public userService: UserService, private ingredientService: IngredientService, private snackBar: MatSnackBar, private measurementUnit: MeasurementUnitService) {
+  constructor(public userService: UserService, private ingredientService: IngredientService, private snackBar: MatSnackBar, 
+    private measurementUnitService: MeasurementUnitService) {
     this.ingredientForm = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.maxLength(30)]),
       measurementUnit: new FormControl(null, [])
@@ -39,20 +40,24 @@ export class AddIngredientComponent implements OnInit {
   get name() { return this.ingredientForm.get('name'); }
 
   ngOnInit(): void {
-    
-    this.measurementUnit.getAllMeasurementUnits().subscribe(measurementUnit => {
+    this.measurementUnitService.getAllMeasurementUnits().subscribe(measurementUnit => {
+      debugger;
       this.measurementUnitList = measurementUnit;
-      this.ingredientForm.get('measurementUnit').setValue(measurementUnit[0]);
+      this.ingredientForm.get('measurementUnit').setValue(this.measurementUnitList[0]);
     });
+    
     this.displayedColumns = (this.userService.currentUser?.roleName == 'approver' || this.userService.currentUser?.roleName == 'admin') ? ["name", "measurementUnit", "delete"] : ["name", "measurementUnit"]
   };
 
   ngAfterViewInit(): void {
-    this.ingredientService.getAllApprovedIngredients().subscribe(res => {
-      this.ingredientsList = res;
+    this.ingredientService.getAllApprovedIngredients().subscribe(res => {  
+      res.forEach(ingredient => {
+        ingredient.measurementUnitName = this.measurementUnitList.find(x => x.id == ingredient.measurementUnitId).name
+      });
+      this.ingredientsList = res
       this.dataSource = new MatTableDataSource(res);
       this.dataSource.paginator = this.paginator;
-    }); 
+    });
   }
 
   updateMeasurementUnit(measurementUnit) {

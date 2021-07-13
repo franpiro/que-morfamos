@@ -49,10 +49,10 @@ export class AddRecipeComponent implements OnInit {
     });
     this.measurementUnitService.getAllMeasurementUnits().subscribe(measurementUnitList => {
       this.ingredientService.getAllApprovedIngredients().subscribe(res => {
-        console.log(measurementUnitList);
-        console.log(res);
-        this.ingredientList = res
-        this.ingredientList.forEach(ingredient => ingredient.measurementUnitName = measurementUnitList.find(x => x.id = ingredient.measurementUnitId).name);
+        res.forEach(ingredient => {
+          ingredient.measurementUnitName = measurementUnitList.find(x => x.id == ingredient.measurementUnitId).name
+        });
+        this.ingredientList = res        
       });
     })
     
