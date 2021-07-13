@@ -53,7 +53,6 @@ export class UserService {
               email: data.user.email,
               isBanned: false
             }).then((x) => {
-              console.log("id", x.id);
               this.currentUser = {
                 id: data.user.uid,
                 name: data.user.displayName,
@@ -73,7 +72,6 @@ export class UserService {
 
   public logOut() {
     this.afAuth.signOut().then(() => {
-      console.log("here");
       this.currentUser = null;
       this.router.navigateByUrl("/")
     });
