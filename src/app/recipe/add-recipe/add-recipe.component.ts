@@ -143,6 +143,7 @@ export class AddRecipeComponent implements OnInit {
         if (this.imagePercentage == 100) {
           this.firestorageService.getFileReference(this.recipeForm.value.imageName).getDownloadURL().subscribe((url) => {
             this.recipeForm.value.imageUrl = url; 
+            this.recipeForm.value.image = null;
             this.recipeService.postRecipe(this.recipeForm.value).then(res => {            
               this.showSpinner = false;
               this.snackBar.open("Receta creada satisfactoriamente.", "", {
