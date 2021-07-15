@@ -1,7 +1,7 @@
 <ng-template [ngIf]="userService.currentUser?.roleName == 'approver' || userService.currentUser?.roleName == 'admin'" [ngIfElse]="noPermission">
     <div>
         <h2 style="text-align:center;margin-top: 20px;">Listado Recetas</h2>
-        <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="searchTermWord" (ngModelChange)="searchTerm($event)" placeholder="Buscar receta">
+        <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="termRecipe" (ngModelChange)="searchTermRecipe($event)" placeholder="Buscar receta">
         <table mat-table [dataSource]="dataSourceRecipes">
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Nombre</th>
@@ -17,11 +17,11 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumnsRecipe"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumnsRecipe;"></tr>    
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        <mat-paginator #paginatorRecipe [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
     <div>
         <h2 style="text-align:center;margin-top: 20px;">Listado Ingredientes</h2>
-        <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="searchTermWord" (ngModelChange)="searchTerm($event)" placeholder="Buscar ingrediente">
+        <input type="text" id="filterColumn" class="form-control" style="width: 40%; float: right;" [(ngModel)]="termIngredient" (ngModelChange)="searchTermIngredient($event)" placeholder="Buscar ingrediente">
         <table mat-table [dataSource]="dataSourceIngredients">
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Nombre</th>
@@ -41,7 +41,7 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumnsIngredient"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumnsIngredient;"></tr>    
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        <mat-paginator #paginatorIngredient [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
     <app-spinner [displayProgressSpinner]="showSpinner"></app-spinner>
 </ng-template>

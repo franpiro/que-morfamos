@@ -23,8 +23,10 @@ export class JudgeSuggestionComponent implements OnInit {
   public displayedColumnsIngredient: string[] = ["name", "measurementUnit", "accion"];
   public dataSourceRecipes: MatTableDataSource<Recipe>;
   public dataSourceIngredients: MatTableDataSource<Ingredient>;
-  @ViewChild(MatPaginator, { static: true }) paginatorRecipe: MatPaginator;
-  @ViewChild(MatPaginator, { static: true }) paginatorIngredient: MatPaginator;
+  public termIngredient: string;
+  public termRecipe: string;
+  @ViewChild("paginatorRecipe") paginatorRecipe: MatPaginator;
+  @ViewChild("paginatorIngredient") paginatorIngredient: MatPaginator;
 
   constructor(private recipeService: RecipeService, private ingredientService: IngredientService, public userService: UserService, private snackBar: MatSnackBar,
     private measurementUnitService: MeasurementUnitService) { }
@@ -83,6 +85,14 @@ export class JudgeSuggestionComponent implements OnInit {
         });
       });
     }
+  }
+
+  searchTermRecipe(event: string): void {
+    this.dataSourceRecipes.data = this.recipesToApprove.filter(x => x.name.toLowerCase().includes(event.toLowerCase()));
+  }
+
+  searchTermIngredient(event: string): void {
+    this.dataSourceIngredients.data = this.ingredientsToApprove.filter(x => x.name.toLowerCase().includes(event.toLowerCase()));
   }
 
   approveIngredient(ingredientId: string): void {
